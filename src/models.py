@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 
 
@@ -56,13 +57,21 @@ class SentenceClassificationModel(nn.Module):
 
         self.embedder = embedder
 
+        n_features = embedder.embedding_dim * 4
         self.mlp = nn.Sequential(
-            nn.Linear(embedder.embedding_dim, hidden_dim),
+            nn.Linear(n_features, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, n_classes)
         )
 
-    def forward(self, x):
-        embeddings = self.embedder(x)
-        logits = self.mlp(embeddings)
+    def forward(self, premise, hypothesis):
+        premise_embeddings = self.embedder(premise)
+        hypothesis_embeddings = self.embedder(hypothesis)
+
+        elem_prod = premise_embeddings * hypothesis_embeddings
+        abs_diff = torch.abs(premise_embeddings - hypothesis_embeddings)
+
+        features = torch.cat([premise_embeddings, hypothesis_embeddings, elem_prod, abs_diff], dim=1)
+
+        logits = self.mlp(features)
         return logits
