@@ -1,6 +1,7 @@
-from typing import Dict
+from typing import Dict, List
 import logging
 
+import torch
 from tokenizers import (
     models,
     normalizers,
@@ -31,7 +32,9 @@ def read_glove_embeddings(file_path: str = None) -> Dict[str, list]:
     file_path = file_path or DEFAULT_GLOVE_PATH
     logger.info(f"Reading embeddings from {file_path}")
 
-    embeddings = {}
+    words = [PAD_TOKEN, UNK_TOKEN]
+    embeddings = []
+    
     with open(file_path, 'r', encoding='utf-8') as file:
         for line in file:
             values = line.split()
@@ -41,11 +44,19 @@ def read_glove_embeddings(file_path: str = None) -> Dict[str, list]:
             except:
                 # Skip ". . ." and "at name@domain.com"
                 continue
-            embeddings[word] = vector
-    return embeddings
+            words.append(word)
+            embeddings.append(vector)
+    # Insert embeddings for special tokens
+    embedding_dim = len(vector)
+    embeddings.insert(0, [0]*embedding_dim)
+    embeddings.insert(1, [0]*embedding_dim)
+
+    # Convert embeddings to torch
+    embeddings = torch.tensor(embeddings)
+    return words, embeddings
 
 
-def build_tokenizer(embedding_dict: Dict[str, list]) -> PreTrainedTokenizerFast:
+def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
     """
     Creates a tokenizer.
 
@@ -54,10 +65,10 @@ def build_tokenizer(embedding_dict: Dict[str, list]) -> PreTrainedTokenizerFast:
     Returns:
         tokenizer (PreTrainedTokenizerFast): a tokenizer.
     """
-    vocab = {word: id for word, id in zip(embedding_dict.keys(), range(2, len(embedding_dict.keys())+2))}
+    vocab = {word: id for id, word in enumerate(words)}
     # vocab = {PAD_TOKEN: 0, UNK_TOKEN: 1}
-    vocab[PAD_TOKEN] = 0
-    vocab[UNK_TOKEN] = 1
+    # vocab[PAD_TOKEN] = 0
+    # vocab[UNK_TOKEN] = 1
 
     # Use most simple tokenizer model based on mapping tokens to their corresponding id
     tokenizer_model = models.WordLevel(vocab=vocab, unk_token=UNK_TOKEN)
