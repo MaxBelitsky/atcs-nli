@@ -5,6 +5,7 @@ class MeanEmbedder(nn.Module):
     def __init__(self, vectors):
         super(MeanEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
+        self.embedding_dim = self.embedding.embedding_dim
 
     def forward(self, x):
         embeddings = self.embedding(x) # [bs, tokens, embed_dim]
@@ -16,16 +17,22 @@ class LSTMEmbedder(nn.Module):
     def __init__(self, vectors):
         super(LSTMEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
+        self.embedding_dim = self.embedding.embedding_dim
+
+        self.lstm = nn.LSTM(self.embedding_dim, self.embedding_dim) # TODO: implement LSTM myself
 
     def forward(self, x):
         embeddings = self.embedding(x) # [bs, tokens, embed_dim]
-        # TODO: finish
+        
+        output, (hn, cn) = self.lstm(embeddings)
+        return output[:, -1, :] # return the hidden state of the last token
 
 
 class BiLSTMEmbedder(nn.Module):
     def __init__(self, vectors):
         super(BiLSTMEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
+        self.embedding_dim = self.embedding.embedding_dim
     
     def forward(self, x):
         embeddings = self.embedding(x) # [bs, tokens, embed_dim]
@@ -36,6 +43,7 @@ class BiLSTMPooledEmbedder(nn.Module):
     def __init__(self, vectors):
         super(BiLSTMPooledEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
+        self.embedding_dim = self.embedding.embedding_dim
 
     def forward(self, x):
         embeddings = self.embedding(x) # [bs, tokens, embed_dim]
