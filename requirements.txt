@@ -2,3 +2,4 @@ torch==2.2.2
 datasets==2.18.0
 transformers==4.39.3
 nltk==3.8.1
+scikit-learn==1.4.1

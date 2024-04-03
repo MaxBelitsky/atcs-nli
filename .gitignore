@@ -165,3 +165,4 @@ pretrained/
 SentEval/
 
 .DS_Store
+data/
