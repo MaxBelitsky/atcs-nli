@@ -161,3 +161,7 @@ cython_debug/
 
 *example*
 pretrained/
+
+SentEval/
+
+.DS_Store
