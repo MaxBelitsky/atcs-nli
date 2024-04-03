@@ -2,6 +2,7 @@ import argparse
 
 from src.models import LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder, SentenceClassificationModel
 from src.utils import read_glove_embeddings, build_tokenizer, get_dataset
+from src.constants import AvailableEmbedders
 
 
 if __name__ == "__main__":
@@ -11,7 +12,8 @@ if __name__ == "__main__":
         "--model",
         type=str,
         help="The model variant to train",
-        choices=["lstm"]
+        required=True,
+        choices=AvailableEmbedders.values()
     )
     parser.add_argument(
         "--mlp_hidden_dim",
@@ -35,11 +37,11 @@ if __name__ == "__main__":
     tokenizer = build_tokenizer(words)
 
     # Initialize the embedding model and auxiluary model
-    if args.model == "lstm":
+    if args.model == AvailableEmbedders.LSTM:
         embedder = LSTMEmbedder(vectors)
-    elif args.model == "bi-lstm":
+    elif args.model == AvailableEmbedders.BI_LSTM:
         embedder = BiLSTMEmbedder(vectors)
-    elif args.model == "bi-lstm-pool":
+    elif args.model == AvailableEmbedders.BI_LSTM_POOL:
         embedder = BiLSTMPooledEmbedder(vectors)
 
     model = SentenceClassificationModel(embedder, args.mlp_hidden_dim, 3)
