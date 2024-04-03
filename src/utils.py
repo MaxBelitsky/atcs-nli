@@ -2,6 +2,7 @@ from typing import Dict, List
 import logging
 
 import torch
+from datasets import load_dataset
 from tokenizers import (
     models,
     normalizers,
@@ -10,6 +11,7 @@ from tokenizers import (
 )
 from transformers import PreTrainedTokenizerFast
 
+DATASET_PATH = "stanfordnlp/snli"
 DEFAULT_GLOVE_PATH = "pretrained/glove.840B.300d.txt"
 UNK_TOKEN = "<unk>"
 PAD_TOKEN = "<pad>"
@@ -92,5 +94,5 @@ def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
     return tokenizer
 
 
-def get_data():
-    pass
+def get_dataset():
+    return load_dataset(DATASET_PATH)
