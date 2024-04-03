@@ -40,7 +40,7 @@ def read_glove_embeddings(file_path: str = None, dim: int = 300) -> Dict[str, li
     
     with open(file_path, 'r', encoding='utf-8') as file:
         for line in file:
-            values = line.split(b" ")
+            values = line.split(" ")
             word = values[0]
             try:
                 vector = [float(val) for val in values[1:]]
