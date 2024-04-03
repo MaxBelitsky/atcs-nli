@@ -19,13 +19,14 @@ PAD_TOKEN = "<pad>"
 logger = logging.getLogger(__name__)
 
 
-def read_glove_embeddings(file_path: str = None) -> Dict[str, list]:
+def read_glove_embeddings(file_path: str = None, dim: int = 300) -> Dict[str, list]:
     """
     Reads the GloVe embeddings from the provided file path.
     If the path not provided, glove.840B.300d is loaded.
 
     Args:
         file_path (str): path to the file with GloVe embeddings
+        dim (int): the dimensionality of vectors
     Returns:
         embeddings (dict): a dictionary mapping the words to their
             embeddings
@@ -39,10 +40,12 @@ def read_glove_embeddings(file_path: str = None) -> Dict[str, list]:
     
     with open(file_path, 'r', encoding='utf-8') as file:
         for line in file:
-            values = line.split()
+            values = line.split(b" ")
             word = values[0]
             try:
                 vector = [float(val) for val in values[1:]]
+                if len(vector) != dim:
+                    continue
             except:
                 # Skip ". . ." and "at name@domain.com"
                 continue
@@ -68,9 +71,6 @@ def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
         tokenizer (PreTrainedTokenizerFast): a tokenizer.
     """
     vocab = {word: id for id, word in enumerate(words)}
-    # vocab = {PAD_TOKEN: 0, UNK_TOKEN: 1}
-    # vocab[PAD_TOKEN] = 0
-    # vocab[UNK_TOKEN] = 1
 
     # Use most simple tokenizer model based on mapping tokens to their corresponding id
     tokenizer_model = models.WordLevel(vocab=vocab, unk_token=UNK_TOKEN)
