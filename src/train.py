@@ -1,8 +1,10 @@
 import argparse
 
 from src.models import LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder, SentenceClassificationModel
-from src.utils import read_glove_embeddings, build_tokenizer, get_dataset
+from src.utils import read_glove_embeddings, build_tokenizer
+from src.data import get_dataset
 from src.constants import AvailableEmbedders
+from src.trainer import Trainer
 
 
 if __name__ == "__main__":
@@ -27,8 +29,34 @@ if __name__ == "__main__":
         default=1e-5,
         help="The learning rate"
     )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=10,
+        help="The number of epochs"
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=64,
+        help="The batch size"
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default="models/",
+        help="The directory to save models to"
+    )
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        help="The model checkpoint to continue training from"
+    )
+    # TODO: add other arguments
 
     args = parser.parse_args()
+
+    # TODO: set seed
 
     # Load GloVe embeddings
     words, vectors = read_glove_embeddings()
@@ -49,13 +77,6 @@ if __name__ == "__main__":
     # Initialize the dataset
     dataset = get_dataset()
 
-    # Set up logging
-
-    # Define training arguments
-    training_args = None
-
-    # Initialize trainer
-    trainer = None
-
-    trainer.train()
-    trainer.save_model()
+    # Train the model
+    trainer = Trainer(model, dataset, tokenizer, args)
+    trainer.train_model()
