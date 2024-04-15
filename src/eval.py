@@ -10,9 +10,10 @@ from src.models import MeanEmbedder
 
 # PATH_TO_DATA = PATH_TO_SENTEVAL+'/data'
 PATH_TO_DATA = 'pretrained'
-PATH_TO_VEC = 'pretrained/glove.6B.300d.txt'
+# PATH_TO_VEC = 'pretrained/glove.6B.300d.txt'
 # PATH_TO_VEC = 'pretrained/glove.840B.300d.txt'
-WORDS, VECTORS = read_glove_embeddings(PATH_TO_VEC)
+# WORDS, VECTORS = read_glove_embeddings(PATH_TO_VEC)
+WORDS, VECTORS = read_glove_embeddings("840B")
 
 # Set up logger
 logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
@@ -42,10 +43,14 @@ def batcher(params, batch):
     embeddings = []
 
     for sent in batch:
-        sentence = "".join(sent)
-        tokens_ids = params.tokenizer(sentence, return_tensors="pt", padding=True)[
-            "input_ids"
-        ]
+        # sentence = " ".join(sent)
+        # tokens_ids = params.tokenizer(sentence, return_tensors="pt", padding=True)[
+        #     "input_ids"
+        # ]
+        tokens_ids = torch.tensor(
+            params.tokenizer.convert_tokens_to_ids(sent)
+        ).unsqueeze(dim=0)
+
         with torch.no_grad():
             sentence_embeddings = params.embedder(tokens_ids)
         sentence_embeddings = sentence_embeddings.squeeze().numpy()
