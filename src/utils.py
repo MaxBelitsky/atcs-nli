@@ -1,8 +1,9 @@
-from typing import Dict, List
+from typing import List
 import logging
 
+import numpy as np
 import torch
-from datasets import load_dataset
+from torchtext.vocab import GloVe
 from tokenizers import (
     models,
     normalizers,
@@ -11,7 +12,6 @@ from tokenizers import (
 )
 from transformers import PreTrainedTokenizerFast
 
-DATASET_PATH = "stanfordnlp/snli"
 DEFAULT_GLOVE_PATH = "pretrained/glove.840B.300d.txt"
 UNK_TOKEN = "<unk>"
 PAD_TOKEN = "<pad>"
@@ -19,45 +19,10 @@ PAD_TOKEN = "<pad>"
 logger = logging.getLogger(__name__)
 
 
-def read_glove_embeddings(file_path: str = None, dim: int = 300) -> Dict[str, list]:
-    """
-    Reads the GloVe embeddings from the provided file path.
-    If the path not provided, glove.840B.300d is loaded.
-
-    Args:
-        file_path (str): path to the file with GloVe embeddings
-        dim (int): the dimensionality of vectors
-    Returns:
-        embeddings (dict): a dictionary mapping the words to their
-            embeddings
-    """
-
-    file_path = file_path or DEFAULT_GLOVE_PATH
-    logger.info(f"Reading embeddings from {file_path}")
-
-    words = [PAD_TOKEN, UNK_TOKEN]
-    embeddings = []
-    
-    with open(file_path, 'r', encoding='utf-8') as file:
-        for line in file:
-            values = line.split(" ")
-            word = values[0]
-            try:
-                vector = [float(val) for val in values[1:]]
-                if len(vector) != dim:
-                    continue
-            except:
-                # Skip ". . ." and "at name@domain.com"
-                continue
-            words.append(word)
-            embeddings.append(vector)
-    # Insert embeddings for special tokens
-    embedding_dim = len(vector)
-    embeddings.insert(0, [0]*embedding_dim)
-    embeddings.insert(1, [0]*embedding_dim)
-
-    # Convert embeddings to torch
-    embeddings = torch.tensor(embeddings)
+def read_glove_embeddings(name: str = "840B", dim: int = 300):
+    glove = GloVe(name, dim)
+    words = [PAD_TOKEN, UNK_TOKEN] + glove.itos
+    embeddings = torch.cat((torch.zeros(2, dim), glove.vectors))
     return words, embeddings
 
 
@@ -94,5 +59,37 @@ def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
     return tokenizer
 
 
-def get_dataset():
-    return load_dataset(DATASET_PATH)
+def set_seed(seed):
+    """
+    Function for setting the seed for reproducibility.
+    """
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+    try:
+        if torch.backends.mps.is_available():
+            torch.mps.manual_seed(seed)
+    except:
+        pass
+
+
+def set_device():
+    """
+    Function for setting the device.
+    """
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+
+    try:
+        if torch.backends.mps.is_available():
+            device = torch.device('mps')
+    except:
+        device = torch.device('cpu')
+    return device
