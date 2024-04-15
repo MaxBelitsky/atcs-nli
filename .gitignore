@@ -166,3 +166,4 @@ SentEval/
 
 .DS_Store
 data/
+.vector_cache/
