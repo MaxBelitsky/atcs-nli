@@ -7,7 +7,7 @@ class ExtendedEnum(Enum):
         return list(map(lambda c: c.value, cls))
 
 
-class AvailableEmbedders(ExtendedEnum):
+class AvailableEmbedders(str, ExtendedEnum):
     LSTM = "lstm"
     BI_LSTM = "bi-lstm"
     BI_LSTM_POOL = "bi-lstm-pool"
