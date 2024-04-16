@@ -91,6 +91,12 @@ if __name__ == "__main__":
         help="The directory to save the GloVe embeddings"
     )
     parser.add_argument(
+        "--data_cache_dir",
+        type=str,
+        default=None,
+        help="The directory to save the dataset"
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=1234,
@@ -141,7 +147,7 @@ if __name__ == "__main__":
     model = SentenceClassificationModel(embedder, args.mlp_hidden_dim, 3)
 
     # Initialize the dataset
-    dataset = get_dataset()
+    dataset = get_dataset(cache_dir=args.data_cache_dir)
 
     # Train the model
     trainer = Trainer(model, dataset, tokenizer, args)

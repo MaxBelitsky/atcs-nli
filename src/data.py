@@ -41,7 +41,7 @@ class CustomCollator:
         }
 
 
-def get_dataset(file_path=None):
+def get_dataset(file_path=None, cache_dir=None):
     file_path = file_path or DATASET_PATH
     # TODO: sort dataset by length for efficiency
-    return load_dataset(file_path)
+    return load_dataset(file_path, cache_dir=cache_dir)
