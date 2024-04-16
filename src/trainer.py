@@ -101,11 +101,17 @@ class Trainer:
                 self.save_model()
                 # Shrink learning rate if the accuracy improves
                 if epoch != 0:
+                    logger.info("Shrinking learning rate")
                     self.scheduler_2.step()
             # Update learning rate
             self.scheduler.step()
 
             self.log({"val": val_metrics, "lr": self.scheduler.get_last_lr()})
+
+            # Stop the training if the learning rate is lower than the minimum
+            if self.scheduler.get_lr() < self.args.min_lr:
+                logger.info(f"Stopping training at epoch: {epoch}. Current lr: {self.scheduler.get_lr()}")
+                break
 
     def evaluate_model(self, model, dataloader):
         model.eval()
@@ -141,6 +147,7 @@ class Trainer:
         os.makedirs(self.args.output_dir, exist_ok=True)
         timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
         model_file = os.path.join(self.args.output_dir, f"{self.args.model}_{timestamp}.pt")
+        logger.info(f"Saving the best model to: {model_file}")
         torch.save(self.model.state_dict(), model_file)
 
     def load_checkpoint_weights(self):
