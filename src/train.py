@@ -85,6 +85,12 @@ if __name__ == "__main__":
         help="The model checkpoint to continue training from"
     )
     parser.add_argument(
+        "--embedding_cache_dir",
+        type=str,
+        default=".vector_cache",
+        help="The directory to save the GloVe embeddings"
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=1234,
@@ -119,7 +125,7 @@ if __name__ == "__main__":
     logger.info(f"Beginning training with arguments: {args}")
 
     # Load GloVe embeddings
-    words, vectors = read_glove_embeddings()
+    words, vectors = read_glove_embeddings(cache_dir=args.embedding_cache_dir)
 
     # Load/build the tokenizer
     tokenizer = build_tokenizer(words)

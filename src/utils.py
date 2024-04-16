@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import logging
 
 import numpy as np
@@ -19,8 +19,13 @@ PAD_TOKEN = "<pad>"
 logger = logging.getLogger(__name__)
 
 
-def read_glove_embeddings(name: str = "840B", dim: int = 300, topk=None):
-    glove = GloVe(name, dim)
+def read_glove_embeddings(
+    name: str = "840B",
+    dim: int = 300,
+    topk: Optional[int] = None,
+    cache_dir: Optional[str] = ".vector_cache",
+):
+    glove = GloVe(name, dim, cache=cache_dir)
     words = [PAD_TOKEN, UNK_TOKEN] + glove.itos
     embeddings = torch.cat((torch.zeros(2, dim), glove.vectors))
     if topk:
