@@ -17,6 +17,7 @@ class CustomCollator:
             hypotheses.append(example["hypothesis"])
             labels.append(example["label"])
 
+        # Tokenize sequences
         premises = self.tokenizer(
             premises,
             padding=True,
@@ -29,6 +30,10 @@ class CustomCollator:
             truncation=True,
             return_tensors="pt"
         ).to(self.device)
+
+        premises['length'] = premises["attention_mask"].sum(dim=1).to("cpu")
+        hypotheses['length'] = hypotheses["attention_mask"].sum(dim=1).to("cpu")
+
         return {
             "premises": premises,
             "hypotheses": hypotheses,
