@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 class MeanEmbedder(nn.Module):
     def __init__(self, vectors):
@@ -20,18 +20,33 @@ class MeanEmbedder(nn.Module):
 
 
 class LSTMEmbedder(nn.Module):
-    def __init__(self, vectors):
+    def __init__(self, vectors, n_hidden=2048):
         super(LSTMEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
         self.embedding_dim = self.embedding.embedding_dim
+        self.n_hidden = n_hidden
 
-        self.lstm = nn.LSTM(self.embedding_dim, self.embedding_dim) # TODO: implement LSTM myself
+        self.lstm = nn.LSTM(self.embedding_dim, self.n_hidden, batch_first=True)
 
     def forward(self, x):
-        embeddings = self.embedding(x) # [bs, tokens, embed_dim]
-        
-        output, (hn, cn) = self.lstm(embeddings)
-        return output[:, -1, :] # return the hidden state of the last token
+        embeddings = self.embedding(x['input_ids']) # [bs, tokens, embed_dim]
+
+        # Pack the embeddings
+        packed_embeddings = pack_padded_sequence(
+            embeddings,
+            x["length"],
+            batch_first=True,
+            enforce_sorted=False,
+        )
+
+        # Pass through LSTM
+        packed_output, (hn, cn) = self.lstm(packed_embeddings)
+
+        # Unpack the output
+        # output = pad_packed_sequence(packed_output, batch_first=True)[0]
+
+        # return output[:, -1, :] # return the hidden state of the last token
+        return hn.squeeze() # return the hidden state of the last token
 
 
 class BiLSTMEmbedder(nn.Module):
@@ -62,10 +77,10 @@ class SentenceClassificationModel(nn.Module):
 
         self.embedder = embedder
 
-        n_features = embedder.embedding_dim * 4
+        n_features = embedder.n_hidden * 4
         self.mlp = nn.Sequential(
             nn.Linear(n_features, hidden_dim),
-            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.Linear(hidden_dim, n_classes)
         )
 
