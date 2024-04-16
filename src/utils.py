@@ -19,10 +19,13 @@ PAD_TOKEN = "<pad>"
 logger = logging.getLogger(__name__)
 
 
-def read_glove_embeddings(name: str = "840B", dim: int = 300):
+def read_glove_embeddings(name: str = "840B", dim: int = 300, topk=None):
     glove = GloVe(name, dim)
     words = [PAD_TOKEN, UNK_TOKEN] + glove.itos
     embeddings = torch.cat((torch.zeros(2, dim), glove.vectors))
+    if topk:
+        words = words[:topk+2]
+        embeddings = embeddings[:topk+2]
     return words, embeddings
 
 
