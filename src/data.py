@@ -42,6 +42,12 @@ class CustomCollator:
 
 
 def get_dataset(file_path=None, cache_dir=None):
+    # Load dataset
     file_path = file_path or DATASET_PATH
+    dataset = load_dataset(file_path, cache_dir=cache_dir)
+
+    # Filter the dataset where labels are not equal to -1
+    dataset = dataset.filter(lambda example: example['label'] != -1)
+    
     # TODO: sort dataset by length for efficiency
-    return load_dataset(file_path, cache_dir=cache_dir)
+    return dataset
