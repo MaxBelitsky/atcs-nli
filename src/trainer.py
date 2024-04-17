@@ -109,11 +109,12 @@ class Trainer:
                 best_val_accuracy = val_metrics['accuracy']
                 self.save_model()
                 # Shrink learning rate if the accuracy improves
-                if epoch != 0:
+                if epoch > 0:
                     logger.info("Shrinking learning rate")
                     self.scheduler_2.step()
             # Update learning rate
-            self.scheduler.step()
+            if epoch > 0:
+                self.scheduler.step()
 
             self.log({"val": val_metrics, "lr": self.scheduler.get_last_lr()[0]})
 
