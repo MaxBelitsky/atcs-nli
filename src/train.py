@@ -154,5 +154,7 @@ if __name__ == "__main__":
     trainer.train_model()
     
     # Eval on the test set
+    logger.info("Loading the best model")
+    trainer.load_checkpoint_weights(trainer.model_file)
     test_metrics = trainer.evaluate_model(split="test")
     trainer.log({"test": test_metrics})

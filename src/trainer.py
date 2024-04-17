@@ -22,6 +22,7 @@ class Trainer:
         self.tokenizer = tokenizer
         self.args = args
         self.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
+        self.model_file = os.path.join(self.args.output_dir, f"{self.args.model}_{self.timestamp}.pt")
         logger.info(f"Training run initialized at {self.timestamp}")
 
         # Load weights from a checkpoints if the path is provided
@@ -109,11 +110,12 @@ class Trainer:
             if val_metrics['accuracy'] > best_val_accuracy:
                 best_val_accuracy = val_metrics['accuracy']
                 self.save_model()
-                # Shrink learning rate if the accuracy improves
-                if epoch > 0:
-                    logger.info("Shrinking learning rate")
-                    self.scheduler_2.step()
-            # Update learning rate
+            elif epoch > 0:
+                # Shrink learning rate if the accuracy decreases
+                logger.info("Shrinking learning rate")
+                self.scheduler_2.step()
+
+            # Update learning rate with the main scheduler
             if epoch > 0:
                 self.scheduler.step()
 
@@ -162,14 +164,14 @@ class Trainer:
 
     def save_model(self):
         os.makedirs(self.args.output_dir, exist_ok=True)
-        model_file = os.path.join(self.args.output_dir, f"{self.args.model}_{self.timestamp}.pt")
-        logger.info(f"Saving the best model to: {model_file}")
-        torch.save(self.model.state_dict(), model_file)
+        logger.info(f"Saving the best model to: {self.model_file}")
+        torch.save(self.model.state_dict(), self.model_file)
 
-    def load_checkpoint_weights(self):
+    def load_checkpoint_weights(self, checkpoint_path=None):
+        checkpoint_path = checkpoint_path or self.args.checkpoint_path
         # Check if file exists
-        if not os.path.isfile(self.args.checkpoint_path):
-            raise Exception(f"File {self.args.checkpoint_path} doesn't exist")
+        if not os.path.isfile(checkpoint_path):
+            raise Exception(f"File {checkpoint_path} doesn't exist")
 
         # Load the weights
-        self.model.load_state_dict(torch.load(self.args.checkpoint_path))
+        self.model.load_state_dict(torch.load(checkpoint_path))
