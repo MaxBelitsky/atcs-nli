@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
+
 class MeanEmbedder(nn.Module):
     def __init__(self, vectors):
         super(MeanEmbedder, self).__init__()
@@ -42,10 +43,6 @@ class LSTMEmbedder(nn.Module):
         # Pass through LSTM
         packed_output, (hn, cn) = self.lstm(packed_embeddings)
 
-        # Unpack the output
-        # output = pad_packed_sequence(packed_output, batch_first=True)[0]
-
-        # return output[:, -1, :] # return the hidden state of the last token
         return hn.squeeze() # return the hidden state of the last token
 
 
@@ -78,14 +75,33 @@ class BiLSTMEmbedder(nn.Module):
 
 
 class BiLSTMPooledEmbedder(nn.Module):
-    def __init__(self, vectors):
+    def __init__(self, vectors, n_hidden=2048):
         super(BiLSTMPooledEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
         self.embedding_dim = self.embedding.embedding_dim
 
+        self.lstm = nn.LSTM(self.embedding_dim, n_hidden, batch_first=True, bidirectional=True)
+        self.n_hidden = n_hidden * 2
+
     def forward(self, x):
-        embeddings = self.embedding(x) # [bs, tokens, embed_dim]
-        # TODO: finish
+        embeddings = self.embedding(x['input_ids']) # [bs, tokens, embed_dim]
+        
+        # Pack the embeddings
+        packed_embeddings = pack_padded_sequence(
+            embeddings,
+            x["length"],
+            batch_first=True,
+            enforce_sorted=False,
+        )
+
+        # Pass through LSTM
+        packed_output, (hn, cn) = self.lstm(packed_embeddings)
+
+        # Unpack the output
+        output = pad_packed_sequence(packed_output, batch_first=True)[0]
+
+        # Max pooling
+        return output.max(dim=1).values
 
 
 class SentenceClassificationModel(nn.Module):
