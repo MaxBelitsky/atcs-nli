@@ -17,8 +17,12 @@ class Trainer:
         self.model = model.to(args.device)
         self.train_data = dataset["train"]
         self.val_data = dataset["validation"]
+        if "test" in dataset:
+            self.test_data = dataset["test"]
         self.tokenizer = tokenizer
         self.args = args
+        self.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
+        logger.info(f"Training run initialized at {self.timestamp}")
 
         # Load weights from a checkpoints if the path is provided
         if self.args.checkpoint_path:
@@ -31,15 +35,20 @@ class Trainer:
             collate_fn=collator,
             batch_size=args.batch_size,
             shuffle=True,
-            pin_memory=True,
         )
         self.val_dataloader = DataLoader(
             self.val_data,
             collate_fn=collator,
             batch_size=args.batch_size,
             shuffle=True,
-            pin_memory=True,
         )
+        if "test" in dataset:
+            self.test_dataloader = DataLoader(
+                self.test_data,
+                collate_fn=collator,
+                batch_size=args.batch_size,
+                shuffle=True,
+            )
 
         # Initialize the optimizer
         self.optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
@@ -95,7 +104,7 @@ class Trainer:
                 self.log({"train": step_metrics})
 
             # Eval on validation set
-            val_metrics = self.evaluate_model(self.model, self.val_dataloader)
+            val_metrics = self.evaluate_model(split="val")
             if val_metrics['accuracy'] > best_val_accuracy:
                 best_val_accuracy = val_metrics['accuracy']
                 self.save_model()
@@ -106,20 +115,26 @@ class Trainer:
             # Update learning rate
             self.scheduler.step()
 
-            self.log({"val": val_metrics, "lr": self.scheduler.get_last_lr()})
+            self.log({"val": val_metrics, "lr": self.scheduler.get_last_lr()[0]})
 
             # Stop the training if the learning rate is lower than the minimum
-            if self.scheduler.get_lr() < self.args.min_lr:
-                logger.info(f"Stopping training at epoch: {epoch}. Current lr: {self.scheduler.get_lr()}")
+            if self.scheduler.get_last_lr()[0] < self.args.min_lr:
+                logger.info(f"Stopping training at epoch: {epoch}. Current lr: {self.scheduler.get_last_lr()}")
                 break
 
-    def evaluate_model(self, model, dataloader):
-        model.eval()
+    def evaluate_model(self, split="val"):
+        self.model.eval()
         all_metrics = []
+
+        if split == "val":
+            dataloader = self.val_dataloader
+        elif split == "test":
+            dataloader = self.test_dataloader
+
         for batch in dataloader:
             premises, hypotheses, labels = batch['premises'], batch['hypotheses'], batch['labels']
             with torch.no_grad():
-                model_output = model(premises, hypotheses)
+                model_output = self.model(premises, hypotheses)
             metrics = self.compute_metrics(model_output, labels)
             all_metrics.append(metrics)
         
@@ -145,8 +160,7 @@ class Trainer:
 
     def save_model(self):
         os.makedirs(self.args.output_dir, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
-        model_file = os.path.join(self.args.output_dir, f"{self.args.model}_{timestamp}.pt")
+        model_file = os.path.join(self.args.output_dir, f"{self.args.model}_{self.timestamp}.pt")
         logger.info(f"Saving the best model to: {model_file}")
         torch.save(self.model.state_dict(), model_file)
 

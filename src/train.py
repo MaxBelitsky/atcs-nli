@@ -152,3 +152,7 @@ if __name__ == "__main__":
     # Train the model
     trainer = Trainer(model, dataset, tokenizer, args)
     trainer.train_model()
+    
+    # Eval on the test set
+    test_metrics = trainer.evaluate_model(split="test")
+    trainer.log({"test": test_metrics})

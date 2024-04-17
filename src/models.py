@@ -50,14 +50,26 @@ class LSTMEmbedder(nn.Module):
 
 
 class BiLSTMEmbedder(nn.Module):
-    def __init__(self, vectors):
+    def __init__(self, vectors, n_hidden=2048):
         super(BiLSTMEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
         self.embedding_dim = self.embedding.embedding_dim
+
+        self.n_hidden = n_hidden
+
+        self.lstm = nn.LSTM(self.embedding_dim, self.n_hidden, batch_first=True, bidirectional=True)
     
     def forward(self, x):
         embeddings = self.embedding(x) # [bs, tokens, embed_dim]
-        # TODO: finish
+        
+        # Pack the embeddings
+        packed_embeddings = pack_padded_sequence(
+            embeddings,
+            x["length"],
+            batch_first=True,
+            enforce_sorted=False,
+        )
+        
 
 
 class BiLSTMPooledEmbedder(nn.Module):
