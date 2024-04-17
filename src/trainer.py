@@ -68,7 +68,8 @@ class Trainer:
                     "learning_rate": args.lr,
                     "architecture": args.model,
                     "epochs": args.epochs,
-                }
+                },
+                name=f"{self.args.model}_{self.timestamp}",
             )
 
     def log(self, metrics):
