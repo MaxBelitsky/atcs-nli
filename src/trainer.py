@@ -8,6 +8,7 @@ from tqdm.auto import tqdm
 import wandb
 
 from src.data import CustomCollator
+from src.utils import compute_metrics, evaluate_model, load_checkpoint_weights
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,9 @@ class Trainer:
         self.args = args
         self.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
         self.model_file = os.path.join(self.args.output_dir, f"{self.args.model}_{self.timestamp}.pt")
+        self.embedding_model_file = os.path.join(
+            self.args.output_dir, f"{self.args.model}_embedder.pt"
+        )
         logger.info(f"Training run initialized at {self.timestamp}")
 
         # Load weights from a checkpoints if the path is provided
@@ -101,7 +105,7 @@ class Trainer:
                 self.optimizer.step()
 
                 # Compute and log training metrics
-                step_metrics = self.compute_metrics(model_output, labels)
+                step_metrics = compute_metrics(model_output, labels)
                 step_metrics["loss"] = loss.detach().item()
                 self.log({"train": step_metrics})
 
@@ -128,50 +132,32 @@ class Trainer:
 
     def evaluate_model(self, split="val"):
         self.model.eval()
-        all_metrics = []
 
         if split == "val":
             dataloader = self.val_dataloader
         elif split == "test":
             dataloader = self.test_dataloader
 
-        for batch in dataloader:
-            premises, hypotheses, labels = batch['premises'], batch['hypotheses'], batch['labels']
-            with torch.no_grad():
-                model_output = self.model(premises, hypotheses)
-            metrics = self.compute_metrics(model_output, labels)
-            all_metrics.append(metrics)
-        
-        return self._aggregate_metrics(all_metrics, dataloader)
-    
-    def _aggregate_metrics(self, all_metrics, dataloader):
-        n_batches = len(dataloader)
-        result = {}
-        for batch_metrics in all_metrics:
-            for metric, value in batch_metrics.items():
-                result[metric] = result.get(metric, 0) + value
-        
-        for metric, value in result.items():
-            result[metric] = result.get(metric, 0) / n_batches
-        return result
+        return evaluate_model(self.model, dataloader)
 
-    def compute_metrics(self, preds, target):
-        # Compute accuracy
-        accuracy = (preds.argmax(dim=-1) == target).float().mean()
-
-        metrics = {"accuracy": accuracy}
-        return metrics
-
-    def save_model(self):
+    def save_model(self, skip_glove=True):
         os.makedirs(self.args.output_dir, exist_ok=True)
         logger.info(f"Saving the best model to: {self.model_file}")
-        torch.save(self.model.state_dict(), self.model_file)
 
-    def load_checkpoint_weights(self, checkpoint_path=None):
+        state_dict = self.model.state_dict()
+        if skip_glove:
+            del state_dict['embedder.embedding.weight']
+        torch.save(state_dict, self.model_file)
+
+    def save_embedding_model(self):
+        os.makedirs(self.args.output_dir, exist_ok=True)
+        logger.info(f"Saving the embedding model to: {self.embedding_model_file}")
+        torch.save(self.model.embedder.lstm.state_dict(), self.embedding_model_file)
+
+    def load_checkpoint_weights(self, checkpoint_path=None, skip_glove=True):
         checkpoint_path = checkpoint_path or self.args.checkpoint_path
         # Check if file exists
         if not os.path.isfile(checkpoint_path):
             raise Exception(f"File {checkpoint_path} doesn't exist")
-
         # Load the weights
-        self.model.load_state_dict(torch.load(checkpoint_path))
+        load_checkpoint_weights(self.model, checkpoint_path, self.args.device, skip_glove)

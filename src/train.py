@@ -158,3 +158,6 @@ if __name__ == "__main__":
     trainer.load_checkpoint_weights(trainer.model_file)
     test_metrics = trainer.evaluate_model(split="test")
     trainer.log({"test": test_metrics})
+
+    # Save the embedder
+    trainer.save_embedding_model()
