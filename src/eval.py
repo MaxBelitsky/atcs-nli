@@ -3,72 +3,134 @@ import argparse
 
 import torch
 import senteval
-import numpy as np
 
-from src.utils import build_tokenizer, read_glove_embeddings
-from src.models import MeanEmbedder
+from src.constants import AvailableEmbedders
+from src.utils import (
+    build_tokenizer,
+    read_glove_embeddings,
+    load_checkpoint_weights,
+    set_device,
+    set_seed,
+)
+from src.models import MeanEmbedder, LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder
 
-# PATH_TO_DATA = PATH_TO_SENTEVAL+'/data'
 PATH_TO_DATA = 'pretrained'
-# PATH_TO_VEC = 'pretrained/glove.6B.300d.txt'
-# PATH_TO_VEC = 'pretrained/glove.840B.300d.txt'
-# WORDS, VECTORS = read_glove_embeddings(PATH_TO_VEC)
-WORDS, VECTORS = read_glove_embeddings("840B")
-
 # Set up logger
 logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
 
 
-def prepare(params, samples):
-    """
-    In this example we are going to load Glove, 
-    here you will initialize your model.
-    remember to add what you model needs into the params dictionary
-    """
-    params.tokenizer = build_tokenizer(WORDS)
-    params.embedder = MeanEmbedder(VECTORS)
-
-
 def batcher(params, batch):
     """
-    In this example we use the average of word embeddings as a sentence representation.
-    Each batch consists of one vector for sentence.
-    Here you can process each sentence of the batch, 
-    or a complete batch (you may need masking for that).
-    
+    Exctracts embeddings from a batch of examples.
     """
     # if a sentence is empty dot is set to be the only token
     # you can change it into NULL dependening in your model
-    batch = [sent if sent != [] else ['.'] for sent in batch]
+    batch = [sent if len(sent) > 0 else ['.'] for sent in batch]
     embeddings = []
 
-    for sent in batch:
-        # sentence = " ".join(sent)
-        # tokens_ids = params.tokenizer(sentence, return_tensors="pt", padding=True)[
-        #     "input_ids"
-        # ]
-        tokens_ids = torch.tensor(
-            params.tokenizer.convert_tokens_to_ids(sent)
-        ).unsqueeze(dim=0)
-
-        with torch.no_grad():
-            sentence_embeddings = params.embedder(tokens_ids)
-        sentence_embeddings = sentence_embeddings.squeeze().numpy()
-        embeddings.append(sentence_embeddings)
-    # [batch size, embedding dimensionality]
-    embeddings = np.vstack(embeddings)
+    # Process batch
+    tokenized_inputs = params.tokenizer(
+        batch, return_tensors="pt", is_split_into_words=True, padding=True
+    )
+    tokenized_inputs["length"] = tokenized_inputs['attention_mask'].sum(dim=1).cpu()
+    with torch.no_grad():
+        sentence_embeddings = params.embedder(tokenized_inputs)
+    embeddings = sentence_embeddings.squeeze().numpy()
     return embeddings
 
 
-# Set params for SentEval
-params_senteval = {'task_path': PATH_TO_DATA, 'usepytorch': False, 'kfold': 10}
-# this is the config for the NN classifier but we are going to use scikit-learn logistic regression with 10 kfold
-# params_senteval['classifier'] = {'nhid': 0, 'optim': 'rmsprop', 'batch_size': 128,
-#                                 'tenacity': 3, 'epoch_size': 2}
-
-
 if __name__ == "__main__":
-    se = senteval.engine.SE(params_senteval, batcher, prepare)
+
+    parser = argparse.ArgumentParser(description="Training sentence embedding models")
+
+    ### MODEL ###
+    parser.add_argument(
+        "--model",
+        type=str,
+        help="The model variant to evaluate",
+        required=True,
+        choices=AvailableEmbedders.values() + ["mean"]
+    )
+    parser.add_argument(
+        "--lstm_n_hidden",
+        type=int,
+        default=2048,
+        help="The hidden dimension of the LSTM"
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=128,
+        help="The batch size"
+    )
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        required=False,
+        help="The model checkpoint to evaluate"
+    )
+    parser.add_argument(
+        "--embedding_cache_dir",
+        type=str,
+        default=".vector_cache",
+        help="The directory to save the GloVe embeddings"
+    )
+    parser.add_argument(
+        "--data_cache_dir",
+        type=str,
+        default=None,
+        help="The directory to save the dataset"
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=1111,
+        help="The random seed for reproducibility"
+        )
+    parser.add_argument(
+        "--device", type=str, default=None, help="The device to use for evaluation"
+    )
+
+    args = parser.parse_args()
+
+    # Set seed and device
+    set_seed(args.seed)
+    args.device = args.device or set_device()
+
+    # Load GloVe embeddings
+    words, vectors = read_glove_embeddings(cache_dir=args.embedding_cache_dir)
+
+    # Load/build the tokenizer
+    tokenizer = build_tokenizer(words)
+
+    # Initialize the embedding model and auxiluary model
+    if args.model == AvailableEmbedders.LSTM:
+        embedder = LSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == AvailableEmbedders.BI_LSTM:
+        embedder = BiLSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == AvailableEmbedders.BI_LSTM_POOL:
+        embedder = BiLSTMPooledEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == "mean":
+        embedder = MeanEmbedder(vectors)
+
+    # Load the pretrained weights
+    if args.model != "mean":
+        load_checkpoint_weights(
+            embedder, args.checkpoint_path, args.device, skip_glove=True, embedder_only=True
+        )
+
+    # Set params for SentEval
+    params_senteval = {
+        "task_path": PATH_TO_DATA,
+        "usepytorch": False,
+        "kfold": 10,
+        "embedder": embedder,
+        "tokenizer": tokenizer,
+        "seed": args.seed,
+        "batch_size": args.batch_size
+    }
+
+    se = senteval.engine.SE(params_senteval, batcher)
 
     transfer_tasks = [
         "MR",
