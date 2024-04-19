@@ -11,7 +11,7 @@
 #
 
 data_path=./data/downstream
-preprocess_exec=./tokenizer.sed
+preprocess_exec=./scripts/tokenizer.sed
 
 # Get MOSES
 echo 'Cloning Moses github repository (for tokenization scripts)...'
@@ -25,7 +25,7 @@ if [ ! -d "$SCRIPTS" ]; then
     exit
 fi
 
-PTBTOKENIZER="sed -f tokenizer.sed"
+PTBTOKENIZER="sed -f ./scripts/tokenizer.sed"
 
 mkdir -p $data_path
 
@@ -43,41 +43,16 @@ COCO='https://dl.fbaipublicfiles.com/senteval/coco_r101_feat'
 MRPC='https://download.microsoft.com/download/D/4/6/D46FF87A-F6B9-4252-AA8B-3604ED519838/MSRParaphraseCorpus.msi'
 
 # STS 2012, 2013, 2014, 2015, 2016
-# declare -A STS_tasks
-# declare -A STS_paths
-# declare -A STS_subdirs
+declare -A STS_tasks
+declare -A STS_paths
+declare -A STS_subdirs
 
-# STS_tasks=(["STS12"]="MSRpar MSRvid SMTeuroparl surprise.OnWN surprise.SMTnews" ["STS13"]="FNWN headlines OnWN" ["STS14"]="deft-forum deft-news headlines OnWN images tweet-news" ["STS15"]="answers-forums answers-students belief headlines images" ["STS16"]="answer-answer headlines plagiarism postediting question-question")
+STS_tasks=(["STS12"]="MSRpar MSRvid SMTeuroparl surprise.OnWN surprise.SMTnews" ["STS13"]="FNWN headlines OnWN" ["STS14"]="deft-forum deft-news headlines OnWN images tweet-news" ["STS15"]="answers-forums answers-students belief headlines images" ["STS16"]="answer-answer headlines plagiarism postediting question-question")
 
-# STS_paths=(["STS12"]="http://ixa2.si.ehu.es/stswiki/images/4/40/STS2012-en-test.zip" ["STS13"]="http://ixa2.si.ehu.es/stswiki/images/2/2f/STS2013-en-test.zip" ["STS14"]="http://ixa2.si.ehu.es/stswiki/images/8/8c/STS2014-en-test.zip" ["STS15"]="http://ixa2.si.ehu.es/stswiki/images/d/da/STS2015-en-test.zip"
-# ["STS16"]="http://ixa2.si.ehu.es/stswiki/images/9/98/STS2016-en-test.zip")
+STS_paths=(["STS12"]="http://ixa2.si.ehu.es/stswiki/images/4/40/STS2012-en-test.zip" ["STS13"]="http://ixa2.si.ehu.es/stswiki/images/2/2f/STS2013-en-test.zip" ["STS14"]="http://ixa2.si.ehu.es/stswiki/images/8/8c/STS2014-en-test.zip" ["STS15"]="http://ixa2.si.ehu.es/stswiki/images/d/da/STS2015-en-test.zip"
+["STS16"]="http://ixa2.si.ehu.es/stswiki/images/9/98/STS2016-en-test.zip")
 
-# STS_subdirs=(["STS12"]="test-gold" ["STS13"]="test-gs" ["STS14"]="sts-en-test-gs-2014" ["STS15"]="test_evaluation_task2a" ["STS16"]="sts2016-english-with-gs-v1.0")
-
-
-declare -A STS_tasks=(
-    ["STS12"]="MSRpar MSRvid SMTeuroparl surprise.OnWN surprise.SMTnews"
-    ["STS13"]="FNWN headlines OnWN"
-    ["STS14"]="deft-forum deft-news headlines OnWN images tweet-news"
-    ["STS15"]="answers-forums answers-students belief headlines images"
-    ["STS16"]="answer-answer headlines plagiarism postediting question-question"
-)
-
-declare -A STS_paths=(
-    ["STS12"]="http://ixa2.si.ehu.es/stswiki/images/4/40/STS2012-en-test.zip"
-    ["STS13"]="http://ixa2.si.ehu.es/stswiki/images/2/2f/STS2013-en-test.zip"
-    ["STS14"]="http://ixa2.si.ehu.es/stswiki/images/8/8c/STS2014-en-test.zip"
-    ["STS15"]="http://ixa2.si.ehu.es/stswiki/images/d/da/STS2015-en-test.zip"
-    ["STS16"]="http://ixa2.si.ehu.es/stswiki/images/9/98/STS2016-en-test.zip"
-)
-
-declare -A STS_subdirs=(
-    ["STS12"]="test-gold"
-    ["STS13"]="test-gs"
-    ["STS14"]="sts-en-test-gs-2014"
-    ["STS15"]="test_evaluation_task2a"
-    ["STS16"]="sts2016-english-with-gs-v1.0"
-)
+STS_subdirs=(["STS12"]="test-gold" ["STS13"]="test-gs" ["STS14"]="sts-en-test-gs-2014" ["STS15"]="test_evaluation_task2a" ["STS16"]="sts2016-english-with-gs-v1.0")
 
 
 ### Get Stanford Sentiment Treebank (SST) binary classification task
