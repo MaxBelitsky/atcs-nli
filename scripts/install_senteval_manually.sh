@@ -2,7 +2,6 @@
 
 # Clone the library
 git clone https://github.com/facebookresearch/SentEval.git
-# pip install git+https://github.com/facebookresearch/SentEval.git
 
 # Install the library
 cd SentEval/
