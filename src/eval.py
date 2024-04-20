@@ -138,7 +138,7 @@ if __name__ == "__main__":
         "CR",
         "MPQA",
         "SUBJ",
-        "SST",
+        "SST2",
         "TREC",
         "MRPC",
         "SICKEntailment",
