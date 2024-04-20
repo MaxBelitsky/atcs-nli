@@ -130,7 +130,7 @@ if __name__ == "__main__":
     # Set params for SentEval
     params_senteval = {
         "task_path": PATH_TO_DATA,
-        "usepytorch": True,
+        "usepytorch": False,
         "kfold": 5,
         "seed": args.seed,
         "batch_size": args.batch_size
@@ -141,14 +141,14 @@ if __name__ == "__main__":
     transfer_tasks = [
         "MR",
         "CR",
-        "MPQA",
-        "SUBJ",
-        "SST2",
-        "TREC",
-        "MRPC",
-        "SICKEntailment",
-        "SICKRelatedness",
-        "STS14"
+        # "MPQA",
+        # "SUBJ",
+        # "SST2",
+        # "TREC",
+        # "MRPC",
+        # "SICKEntailment",
+        # "SICKRelatedness",
+        # "STS14"
     ] 
     # senteval prints the results and returns a dictionary with the scores
     results = se.eval(transfer_tasks)
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     }
     try:
         for task, values in results.items():
-            if ['devacc'] not in values:
+            if 'devacc' not in values:
                 continue
             averages['macro'] += values['devacc']
             macro_count += 1
