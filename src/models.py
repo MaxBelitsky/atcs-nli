@@ -10,13 +10,13 @@ class MeanEmbedder(nn.Module):
         self.embedding_dim = self.embedding.embedding_dim
 
     def forward(self, x):
-        embeddings = self.embedding(x) # [bs, tokens, embed_dim]
+        embeddings = self.embedding(x['input_ids']) # [bs, tokens, embed_dim]
 
         # Mask all unknown tokens so that 0s don't affect the mean
-        mask = embeddings.sum(dim=-1) != 0
-        out = embeddings.sum(dim=1) / mask.sum(dim=-1).view(embeddings.shape[0], 1)
+        # mask = embeddings.sum(dim=-1) != 0
+        # out = embeddings.sum(dim=1) / mask.sum(dim=-1).view(embeddings.shape[0], 1)
 
-        # out = embeddings.mean(dim=1) # [bs, embed_dim]
+        out = embeddings.mean(dim=1) # [bs, embed_dim]
         return out
 
 
