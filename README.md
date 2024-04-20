@@ -9,10 +9,8 @@ The repository contains the code for the reproduction of the results from "Super
 - Activate the virtual environment: `. ./venv/bin/activate`
 - Install the dependencies: `pip install -r requirements.txt`
 - Install `SentEval` framework: `./scripts/install_senteval_pip.sh` (might not download the STS dataset on MacOS)
-
-SentEval uses old code so the Python vesrion should be 3.9. A workaround can be found here: https://github.com/facebookresearch/SentEval/issues/89.
-
-STS14 benchmark code in SentEval doesn't work so this workaround needs to be appied in order to evaluate the models on STS14 dataset https://github.com/facebookresearch/SentEval/issues/94.
+    - SentEval uses old code so the Python vesrion should be 3.9. A workaround can be found here: https://github.com/facebookresearch/SentEval/issues/89.
+    - STS14 benchmark code in SentEval doesn't work with newer numpy versions, so this workaround needs to be appied in order to evaluate the models on STS14 dataset: https://github.com/facebookresearch/SentEval/issues/94.
 
 ### Model training
 Example usage:
