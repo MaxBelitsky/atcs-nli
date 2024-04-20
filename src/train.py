@@ -1,7 +1,13 @@
 import argparse
 import logging
 
-from src.models import LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder, SentenceClassificationModel
+from src.models import (
+    MeanEmbedder,
+    LSTMEmbedder,
+    BiLSTMEmbedder,
+    BiLSTMPooledEmbedder,
+    SentenceClassificationModel,
+)
 from src.utils import align_vocab_and_build_tokenizer, set_device, set_seed, exctract_sentences
 from src.data import get_dataset
 from src.constants import AvailableEmbedders
@@ -145,6 +151,8 @@ if __name__ == "__main__":
         embedder = BiLSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
     elif args.model == AvailableEmbedders.BI_LSTM_POOL:
         embedder = BiLSTMPooledEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == AvailableEmbedders.MEAN:
+        embedder = MeanEmbedder(vectors)
 
     model = SentenceClassificationModel(embedder, args.mlp_hidden_dim, 3)
 

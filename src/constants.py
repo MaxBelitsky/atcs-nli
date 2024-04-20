@@ -11,3 +11,4 @@ class AvailableEmbedders(str, ExtendedEnum):
     LSTM = "lstm"
     BI_LSTM = "bi-lstm"
     BI_LSTM_POOL = "bi-lstm-pool"
+    MEAN = "mean"

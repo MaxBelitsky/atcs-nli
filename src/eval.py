@@ -1,9 +1,9 @@
+import sys
 import logging
 import argparse
 from functools import partial
 
 import torch
-import senteval
 
 from src.constants import AvailableEmbedders
 from src.utils import (
@@ -14,7 +14,10 @@ from src.utils import (
 )
 from src.models import MeanEmbedder, LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder
 
-PATH_TO_DATA = 'data'
+sys.path.insert(0, "")
+import senteval
+
+PATH_TO_DATA = f"SentEval/data"
 # Set up logger
 logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
 
@@ -30,11 +33,11 @@ def prepare(params, samples, args):
         embedder = BiLSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
     elif args.model == AvailableEmbedders.BI_LSTM_POOL:
         embedder = BiLSTMPooledEmbedder(vectors, n_hidden=args.lstm_n_hidden)
-    elif args.model == "mean":
+    elif args.model == AvailableEmbedders.MEAN:
         embedder = MeanEmbedder(vectors)
 
     # Load the pretrained weights
-    if args.model != "mean":
+    if args.model != AvailableEmbedders.MEAN:
         load_checkpoint_weights(
             embedder, args.checkpoint_path, args.device, skip_glove=True, embedder_only=True
         )
@@ -73,7 +76,7 @@ if __name__ == "__main__":
         type=str,
         help="The model variant to evaluate",
         required=True,
-        choices=AvailableEmbedders.values() + ["mean"]
+        choices=AvailableEmbedders.values()
     )
     parser.add_argument(
         "--lstm_n_hidden",
@@ -147,4 +150,4 @@ if __name__ == "__main__":
     ] 
     # senteval prints the results and returns a dictionary with the scores
     results = se.eval(transfer_tasks)
-    print(results) # TODO: save the results to JSON
+    print(results)
