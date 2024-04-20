@@ -1,6 +1,7 @@
 import sys
 import logging
 import argparse
+import logging
 from functools import partial
 
 import torch
@@ -17,6 +18,7 @@ from src.models import MeanEmbedder, LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledE
 sys.path.insert(0, "")
 import senteval
 
+logger = logging.getLogger(__name__)
 PATH_TO_DATA = f"SentEval/data"
 # Set up logger
 logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
@@ -151,3 +153,29 @@ if __name__ == "__main__":
     # senteval prints the results and returns a dictionary with the scores
     results = se.eval(transfer_tasks)
     print(results)
+
+    # Compute macto and micro averages
+    macro_count = 0
+    total_samples = 0
+    averages = {
+        "macro": 0,
+        "micro": 0
+    }
+    try:
+        for task, values in results.items():
+            if ['devacc'] not in values:
+                continue
+            averages['macro'] += values['devacc']
+            macro_count += 1
+
+            if 'ndev' not in values:
+                continue
+            averages['micro'] += values['devacc'] * values['ndev']
+            total_samples += values['ndev']
+
+        averages['macro'] = averages['macro'] / macro_count
+        averages['micro'] = averages['micro'] / total_samples
+        print(averages)
+
+    except Exception as e:
+        logger.error(f"Could not compute transfer averages. Error: {e}")
