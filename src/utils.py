@@ -1,4 +1,3 @@
-from typing import List, Optional
 import logging
 from collections import OrderedDict
 
@@ -26,6 +25,7 @@ def get_unique_tokens(sentences, normalizer, pre_tokenizer):
         tokenized_sentence = pre_tokenizer.pre_tokenize_str(normalized_sentence)
         for token in tokenized_sentence:
             unique_tokens.add(token[0])
+    logger.info(f"Found {len(unique_tokens)} unique tokens")
     return unique_tokens
 
 
@@ -46,6 +46,7 @@ def align_with_glove(word_freqs, words, vectors):
             aligned_words.append(word)
             aligned_vectors.append(vector)
     # Add special tokens
+    logger.info(f"Found {len(aligned_words)} tokens with embeddings")
     aligned_words = [PAD_TOKEN, UNK_TOKEN] + aligned_words
     aligned_vectors = torch.stack(aligned_vectors)
     aligned_vectors = torch.cat((torch.zeros(2, vectors.size(-1)), aligned_vectors))
