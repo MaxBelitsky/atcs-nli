@@ -8,7 +8,7 @@ The repository contains the code for the reproduction of the results from "Super
 - Create a virtual environment: `python -m venv venv`
 - Activate the virtual environment: `. ./venv/bin/activate`
 - Install the dependencies: `pip install -r requirements.txt`
-- Install `SentEval` framework: `./scripts/install_senteval_pip.sh` (might not download the STS dataset on MacOS)
+- Install `SentEval` framework: `./scripts/install_senteval.sh` (might not download the STS dataset on MacOS)
 - SentEval troublshooting: SentEval uses old code so the Python versions =>3.10 can lead to errors:
     - `ValueError: Function has keyword-only parameters or annotations, use inspect.signature() API which can support them`: A fix/workaround can be found here: https://github.com/facebookresearch/SentEval/issues/89.
     - `ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (750,) + inhomogeneous part.` on STS14 benchmark. STS14 benchmark code in SentEval doesn't work with newer numpy versions. A fix/workaround can be found here: https://github.com/facebookresearch/SentEval/issues/94.
