@@ -9,8 +9,9 @@ The repository contains the code for the reproduction of the results from "Super
 - Activate the virtual environment: `. ./venv/bin/activate`
 - Install the dependencies: `pip install -r requirements.txt`
 - Install `SentEval` framework: `./scripts/install_senteval_pip.sh` (might not download the STS dataset on MacOS)
-    - SentEval uses old code so the Python vesrion should be 3.9. A workaround can be found here: https://github.com/facebookresearch/SentEval/issues/89.
-    - STS14 benchmark code in SentEval doesn't work with newer numpy versions, so this workaround needs to be appied in order to evaluate the models on STS14 dataset: https://github.com/facebookresearch/SentEval/issues/94.
+- SentEval troublshooting: SentEval uses old code so the Python versions =>3.10 can lead to errors:
+    - `ValueError: Function has keyword-only parameters or annotations, use inspect.signature() API which can support them`: A fix/workaround can be found here: https://github.com/facebookresearch/SentEval/issues/89.
+    - `ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (750,) + inhomogeneous part.` on STS14 benchmark. STS14 benchmark code in SentEval doesn't work with newer numpy versions. A fix/workaround can be found here: https://github.com/facebookresearch/SentEval/issues/94.
 
 ### Model training
 Example usage:
@@ -42,10 +43,9 @@ The accuracy is rounded to two decimal points.
 
 
 ### Transfer results
-
-| Model                   | MR | CR | SUBJ | MPQA | SST | TREC | MRPC | SICK-R | SICK-E | STS14 |
-|-------------------------|----|----|------|------|-----|------|------|--------|--------|-------|
-| GloVe BOW               |    |    |      |      |     |      |      |        |        |       |
-| LSTM                    |    |    |      |      |     |      |      |        |        |       |
-| BiLSTM                  |    |    |      |      |     |      |      |        |        |       |
-| BiLSTM with max pooling |    |    |      |      |     |      |      |        |        |       |
+| Model                   | MR    | CR    | SUBJ  | MPQA  | SST   | TREC | MRPC        | SICK-R | SICK-E | STS14     |
+|-------------------------|-------|-------|-------|-------|-------|------|-------------|--------|--------|-----------|
+| GloVe BOW               |       |       |       |       |       |      |             |        |        |           |
+| LSTM                    | 73.86 | 77.69 | 86.38 | 87.69 | 77.98 | 75.4 | 73.04/81.39 | 0.8627 | 84.33  | 0.14/0.32 |
+| BiLSTM                  | 74.6  | 79.08 | 89.33 | 88.06 | 79.41 | 87.8 | 73.57/82.12 | 0.8719 | 84.96  | 0.30/0.30 |
+| BiLSTM with max pooling |       |       |       |       |       |      |             |        |        |           |
