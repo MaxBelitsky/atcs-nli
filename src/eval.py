@@ -1,13 +1,13 @@
 import logging
 import argparse
+from functools import partial
 
 import torch
 import senteval
 
 from src.constants import AvailableEmbedders
 from src.utils import (
-    build_tokenizer,
-    read_glove_embeddings,
+    align_vocab_and_build_tokenizer,
     load_checkpoint_weights,
     set_device,
     set_seed,
@@ -19,12 +19,36 @@ PATH_TO_DATA = 'data'
 logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
 
 
+def prepare(params, samples, args):
+    sentences = [' '.join(s) for s in samples]
+    tokenizer, vectors = align_vocab_and_build_tokenizer(sentences, args.embedding_cache_dir)
+
+    # Initialize the embedding model and auxiluary model
+    if args.model == AvailableEmbedders.LSTM:
+        embedder = LSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == AvailableEmbedders.BI_LSTM:
+        embedder = BiLSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == AvailableEmbedders.BI_LSTM_POOL:
+        embedder = BiLSTMPooledEmbedder(vectors, n_hidden=args.lstm_n_hidden)
+    elif args.model == "mean":
+        embedder = MeanEmbedder(vectors)
+
+    # Load the pretrained weights
+    if args.model != "mean":
+        load_checkpoint_weights(
+            embedder, args.checkpoint_path, args.device, skip_glove=True, embedder_only=True
+        )
+
+    params.tokenizer = tokenizer
+    params.embedder = embedder
+
+
 def batcher(params, batch):
     """
     Exctracts embeddings from a batch of examples.
     """
     # if a sentence is empty dot is set to be the only token
-    pad_token = tokenizer.special_tokens_map['pad_token']
+    pad_token = params.tokenizer.special_tokens_map['pad_token']
     batch = [[token or pad_token for token in list(sent)] if len(sent) > 0 else ['.'] for sent in batch]
     embeddings = []
 
@@ -97,40 +121,17 @@ if __name__ == "__main__":
     set_seed(args.seed)
     args.device = args.device or set_device()
 
-    # Load GloVe embeddings
-    words, vectors = read_glove_embeddings(cache_dir=args.embedding_cache_dir)
-
-    # Load/build the tokenizer
-    tokenizer = build_tokenizer(words)
-
-    # Initialize the embedding model and auxiluary model
-    if args.model == AvailableEmbedders.LSTM:
-        embedder = LSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
-    elif args.model == AvailableEmbedders.BI_LSTM:
-        embedder = BiLSTMEmbedder(vectors, n_hidden=args.lstm_n_hidden)
-    elif args.model == AvailableEmbedders.BI_LSTM_POOL:
-        embedder = BiLSTMPooledEmbedder(vectors, n_hidden=args.lstm_n_hidden)
-    elif args.model == "mean":
-        embedder = MeanEmbedder(vectors)
-
-    # Load the pretrained weights
-    if args.model != "mean":
-        load_checkpoint_weights(
-            embedder, args.checkpoint_path, args.device, skip_glove=True, embedder_only=True
-        )
 
     # Set params for SentEval
     params_senteval = {
         "task_path": PATH_TO_DATA,
         "usepytorch": True,
         "kfold": 5,
-        "embedder": embedder,
-        "tokenizer": tokenizer,
         "seed": args.seed,
         "batch_size": args.batch_size
     }
 
-    se = senteval.engine.SE(params_senteval, batcher)
+    se = senteval.engine.SE(params_senteval, batcher, partial(prepare, args=args))
 
     transfer_tasks = [
         "MR",

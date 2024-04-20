@@ -2,7 +2,7 @@ import argparse
 import logging
 
 from src.models import LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder, SentenceClassificationModel
-from src.utils import read_glove_embeddings, build_tokenizer, set_device, set_seed
+from src.utils import align_vocab_and_build_tokenizer, set_device, set_seed, exctract_sentences
 from src.data import get_dataset
 from src.constants import AvailableEmbedders
 from src.trainer import Trainer
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         default=None,
         help="The device to use for training"
         )
-    
+
     ### LOGGING ###
     parser.add_argument(
         "--use_wandb",
@@ -120,21 +120,23 @@ if __name__ == "__main__":
         action=argparse.BooleanOptionalAction,
         help="Indicates whether to log to Tensorboard"
         )
-    
 
     args = parser.parse_args()
-    
+
     # Set seed and device
     set_seed(args.seed)
     args.device = args.device or set_device()
 
     logger.info(f"Beginning training with arguments: {args}")
 
-    # Load GloVe embeddings
-    words, vectors = read_glove_embeddings(cache_dir=args.embedding_cache_dir)
+    # Initialize the dataset
+    dataset = get_dataset(cache_dir=args.data_cache_dir)
+    sentences = exctract_sentences(dataset)
 
     # Load/build the tokenizer
-    tokenizer = build_tokenizer(words)
+    tokenizer, vectors = align_vocab_and_build_tokenizer(
+        sentences, embedding_cache_dir=args.embedding_cache_dir
+    )
 
     # Initialize the embedding model and auxiluary model
     if args.model == AvailableEmbedders.LSTM:
@@ -146,13 +148,10 @@ if __name__ == "__main__":
 
     model = SentenceClassificationModel(embedder, args.mlp_hidden_dim, 3)
 
-    # Initialize the dataset
-    dataset = get_dataset(cache_dir=args.data_cache_dir)
-
     # Train the model
     trainer = Trainer(model, dataset, tokenizer, args)
     trainer.train_model()
-    
+
     # Eval on the test set
     logger.info("Loading the best model")
     trainer.load_checkpoint_weights(trainer.model_file)

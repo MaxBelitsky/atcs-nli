@@ -13,29 +13,53 @@ from tokenizers import (
 )
 from transformers import PreTrainedTokenizerFast
 
-DEFAULT_GLOVE_PATH = "pretrained/glove.840B.300d.txt"
 UNK_TOKEN = "<unk>"
 PAD_TOKEN = "<pad>"
 
 logger = logging.getLogger(__name__)
 
 
+def get_unique_tokens(sentences, normalizer, pre_tokenizer):
+    unique_tokens = set()
+    for sentence in sentences:
+        normalized_sentence = normalizer.normalize_str(sentence)
+        tokenized_sentence = pre_tokenizer.pre_tokenize_str(normalized_sentence)
+        for token in tokenized_sentence:
+            unique_tokens.add(token[0])
+    return unique_tokens
+
+
 def read_glove_embeddings(
     name: str = "840B",
     dim: int = 300,
-    topk: Optional[int] = None,
-    cache_dir: Optional[str] = ".vector_cache",
+    cache_dir=".vector_cache",
 ):
     glove = GloVe(name, dim, cache=cache_dir)
-    words = [PAD_TOKEN, UNK_TOKEN] + glove.itos
-    embeddings = torch.cat((torch.zeros(2, dim), glove.vectors))
-    if topk:
-        words = words[:topk+2]
-        embeddings = embeddings[:topk+2]
-    return words, embeddings
+    return glove.itos, glove.vectors
 
 
-def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
+def align_with_glove(word_freqs, words, vectors):
+    aligned_words, aligned_vectors = [], []
+
+    for word, vector in zip(words, vectors):
+        if word in word_freqs:
+            aligned_words.append(word)
+            aligned_vectors.append(vector)
+    # Add special tokens
+    aligned_words = [PAD_TOKEN, UNK_TOKEN] + aligned_words
+    aligned_vectors = torch.stack(aligned_vectors)
+    aligned_vectors = torch.cat((torch.zeros(2, vectors.size(-1)), aligned_vectors))
+    return aligned_words, aligned_vectors
+
+
+def exctract_sentences(dataset):
+    sentences = []
+    for split in dataset:
+        sentences.extend(list(set(dataset[split]["premise"] + dataset[split]["hypothesis"])))
+    return sentences
+
+
+def build_tokenizer(words, normalizer, pre_tokenizer) -> PreTrainedTokenizerFast:
     """
     Creates a tokenizer.
 
@@ -51,12 +75,11 @@ def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
 
     # Initialize the tokenizer
     tokenizer = Tokenizer(tokenizer_model)
+    tokenizer.normalizer = normalizer
+    tokenizer.pre_tokenizer = pre_tokenizer
 
-    # Add lowercase normalizer
-    tokenizer.normalizer = normalizers.Sequence([normalizers.Lowercase()])
-
-    # Add a Whitespace pre-tokenizer – split text on whitespace
-    tokenizer.pre_tokenizer = pre_tokenizers.Whitespace() # can use Whitespace() for whitespace + punctuation
+    # Save the tokenizer
+    tokenizer.save("models/tokenizer.json")
 
     # Wrap the tokenizer to use in Transformers
     tokenizer = PreTrainedTokenizerFast(
@@ -66,6 +89,25 @@ def build_tokenizer(words: List[str]) -> PreTrainedTokenizerFast:
         pad_token=PAD_TOKEN,
     )
     return tokenizer
+
+
+def align_vocab_and_build_tokenizer(sentences, embedding_cache_dir=".vector_cache"):
+    # Create a lowercase normalizer
+    normalizer = normalizers.Sequence([normalizers.Lowercase()])
+    # Create a Whitespace pre-tokenizer – split text on whitespace
+    pre_tokenizer = pre_tokenizers.Whitespace()
+
+    # Build a vocabulary and align it with GloVe
+    logger.info("Finding all unique tokens")
+    unique_tokens = get_unique_tokens(sentences, normalizer, pre_tokenizer)
+    logger.info("Aligning with GloVe vectors")
+    words, vectors = read_glove_embeddings(cache_dir=embedding_cache_dir)
+    words, vectors = align_with_glove(unique_tokens, words, vectors)
+
+    # Create a tokenizer
+    tokenizer = build_tokenizer(words, normalizer, pre_tokenizer)
+
+    return tokenizer, vectors
 
 
 def set_seed(seed):
