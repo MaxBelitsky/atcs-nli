@@ -14,7 +14,7 @@ from src.utils import (
 )
 from src.models import MeanEmbedder, LSTMEmbedder, BiLSTMEmbedder, BiLSTMPooledEmbedder
 
-PATH_TO_DATA = 'pretrained'
+PATH_TO_DATA = 'data'
 # Set up logger
 logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
 
@@ -24,8 +24,8 @@ def batcher(params, batch):
     Exctracts embeddings from a batch of examples.
     """
     # if a sentence is empty dot is set to be the only token
-    # you can change it into NULL dependening in your model
-    batch = [sent if len(sent) > 0 else ['.'] for sent in batch]
+    pad_token = tokenizer.special_tokens_map['pad_token']
+    batch = [[token or pad_token for token in list(sent)] if len(sent) > 0 else ['.'] for sent in batch]
     embeddings = []
 
     # Process batch
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=128,
+        default=64,
         help="The batch size"
     )
     parser.add_argument(
@@ -122,8 +122,8 @@ if __name__ == "__main__":
     # Set params for SentEval
     params_senteval = {
         "task_path": PATH_TO_DATA,
-        "usepytorch": False,
-        "kfold": 10,
+        "usepytorch": True,
+        "kfold": 5,
         "embedder": embedder,
         "tokenizer": tokenizer,
         "seed": args.seed,
@@ -137,11 +137,13 @@ if __name__ == "__main__":
         "CR",
         "MPQA",
         "SUBJ",
-        "SST2",
+        "SST",
         "TREC",
         "MRPC",
         "SICKEntailment",
-    ]  # TODO: do smth about STS14 breaking
+        "SICKRelatedness",
+        "STS14"
+    ] 
     # senteval prints the results and returns a dictionary with the scores
     results = se.eval(transfer_tasks)
     print(results) # TODO: save the results to JSON
