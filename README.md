@@ -45,4 +45,9 @@ The accuracy is rounded to two decimal points.
 
 ### Transfer results
 
-
+| Model                   | MR | CR | SUBJ | MPQA | SST | TREC | MRPC | SICK-R | SICK-E | STS14 |
+|-------------------------|----|----|------|------|-----|------|------|--------|--------|-------|
+| GloVe BOW               |    |    |      |      |     |      |      |        |        |       |
+| LSTM                    |    |    |      |      |     |      |      |        |        |       |
+| BiLSTM                  |    |    |      |      |     |      |      |        |        |       |
+| BiLSTM with max pooling |    |    |      |      |     |      |      |        |        |       |
