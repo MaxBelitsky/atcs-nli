@@ -8,6 +8,7 @@ class MeanEmbedder(nn.Module):
         super(MeanEmbedder, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(vectors, freeze=True)
         self.embedding_dim = self.embedding.embedding_dim
+        self.n_hidden = self.embedding.embedding_dim
 
     def forward(self, x):
         embeddings = self.embedding(x['input_ids']) # [bs, tokens, embed_dim]
