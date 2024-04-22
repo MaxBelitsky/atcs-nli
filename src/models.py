@@ -44,7 +44,7 @@ class LSTMEmbedder(nn.Module):
         # Pass through LSTM
         packed_output, (hn, cn) = self.lstm(packed_embeddings)
 
-        return hn.squeeze() # return the hidden state of the last token
+        return hn.squeeze(0) # return the hidden state of the last token
 
 
 class BiLSTMEmbedder(nn.Module):
@@ -72,7 +72,7 @@ class BiLSTMEmbedder(nn.Module):
 
         # Concatenate the hidden states from both directions
         concatenated_hn = torch.cat((hn[0, :, :], hn[1, :, :]), dim=1)
-        return concatenated_hn.squeeze()
+        return concatenated_hn
 
 
 class BiLSTMPooledEmbedder(nn.Module):

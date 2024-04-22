@@ -31,7 +31,7 @@ All arguments with their description can be viewed with `python -m src.eval -h`.
 
 ## Results
 
-Training logs can be found in the [training report](https://wandb.ai/mbelitsky/uva-acts/reports/Untitled-Report--Vmlldzo3NjI3MTQ5?accessToken=jbxp2lji6h7s6nndksome0ujvp82s6dbc9pjujp5gjojfj7gk7jxr0ko59luzwi4).
+Training logs can be found in the [training report](https://api.wandb.ai/links/mbelitsky/rhgok4k3).
 
 The pre-trained models checkpoints can be found [here](https://drive.google.com/drive/folders/18yYWQJ3VB4N7PvhdZDPIs4sUC-TOHe_W?usp=sharing).
 
@@ -41,6 +41,7 @@ The results on the SNLI task. The accuracy is rounded to two decimal points.
 
 | Model                   | Validation accuracy | Test accuracy |
 |-------------------------|---------------------|---------------|
+| Mean                    |         64.19       |      64.92    |
 | LSTM                    |         81.07	    |      80.53    |
 | BiLSTM                  |         80.55	    |      80.32    |
 | BiLSTM with max pooling |         84.87       |      84.47    |
@@ -51,7 +52,7 @@ Following the methodology of Conneau et al. (2018), ”micro” and ”macro” 
 
 | Model                   | Micro | Macro |
 |-------------------------|-------|-------|
-| Mean                    | 77.24 | 74.19 |
+| Mean                    | 82.03 | 79.36 |
 | LSTM                    | 79.75 | 78.94 |
 | BiLSTM                  | 82.63 | 81.7  |
 | BiLSTM with max pooling | 84.25 | 83.27 |
@@ -60,7 +61,7 @@ Following the methodology of Conneau et al. (2018), ”micro” and ”macro” 
 ### Results on specific transfer results
 | Model                   | MR    | CR    | SUBJ  | MPQA  | SST   | TREC | MRPC        | SICK-R | SICK-E | STS14     |
 |-------------------------|-------|-------|-------|-------|-------|------|-------------|--------|--------|-----------|
-| GloVe BOW               |       |       |       |       |       |      |             |        |        |           |
+| Mean                    | 76.79 | 78.01 | 90.90 | 87.41 | 80.45 | 81.4 | 71.83/80.65 | 0.7740 | 77.13  | 0.54/0.56 |
 | LSTM                    | 73.86 | 77.69 | 86.38 | 87.69 | 77.98 | 75.4 | 73.04/81.39 | 0.8627 | 84.33  | 0.14/0.32 |
 | BiLSTM                  | 74.6  | 79.08 | 89.33 | 88.06 | 79.41 | 87.8 | 73.57/82.12 | 0.8719 | 84.96  | 0.30/0.30 |
 | BiLSTM with max pooling | 77.89 | 81.22 | 91.87 | 88.15 | 83.03 | 87.4 | 75.07/83.28 | 0.8824 | 85.06  | 0.69/0.67 |
