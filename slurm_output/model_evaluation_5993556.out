@@ -1,0 +1,171 @@
+============================================================================================== 
+Warning! Mixing Conda and module environments may lead to corruption of the
+user environment. 
+We do not recommend users mixing those two environments unless absolutely
+necessary. Note that 
+SURF does not provide any support for Conda environment.
+For more information, please refer to our software policy page:
+https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
+
+Remember that many packages have already been installed on the system and can
+be loaded using 
+the 'module load <package__name>' command. If you are uncertain if a package is
+already available 
+on the system, please use 'module avail' or 'module spider' to search for it.
+============================================================================================== 
+------------------------------------------------------------------------------------------------------------
+Evaluating Mean
+[2024-04-21 11:26:22,560] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:26:22,902] [INFO] [src.utils:utils.py:28] Found 18463 unique tokens
+[2024-04-21 11:26:22,902] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:26:22,903] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:26:31,778] [INFO] [src.utils:utils.py:49] Found 17724 tokens with embeddings
+[2024-04-21 11:26:31,906] [INFO] [root:binary.py:44] Generating sentence embeddings
+[2024-04-21 11:26:32,980] [INFO] [root:binary.py:50] Generated sentence embeddings
+[2024-04-21 11:26:32,981] [INFO] [root:validation.py:58] Training pytorch-MLP-nhid0-adam-bs64 with (inner) 5-fold cross-validation
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+[2024-04-21 11:27:45,060] [INFO] [root:validation.py:89] Best param found at split 1: l2reg = 0.0001                 with score 77.37
+[2024-04-21 11:29:01,607] [INFO] [root:validation.py:89] Best param found at split 2: l2reg = 1e-05                 with score 77.56
+[2024-04-21 11:30:20,431] [INFO] [root:validation.py:89] Best param found at split 3: l2reg = 1e-05                 with score 77.09
+[2024-04-21 11:31:41,796] [INFO] [root:validation.py:89] Best param found at split 4: l2reg = 0.0001                 with score 77.16
+[2024-04-21 11:32:54,278] [INFO] [root:validation.py:89] Best param found at split 5: l2reg = 0.0001                 with score 77.02
+[2024-04-21 11:32:58,120] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:32:58,226] [INFO] [src.utils:utils.py:28] Found 5348 unique tokens
+[2024-04-21 11:32:58,226] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:32:58,226] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:33:05,732] [INFO] [src.utils:utils.py:49] Found 5311 tokens with embeddings
+[2024-04-21 11:33:05,795] [INFO] [root:binary.py:44] Generating sentence embeddings
+[2024-04-21 11:33:06,160] [INFO] [root:binary.py:50] Generated sentence embeddings
+[2024-04-21 11:33:06,160] [INFO] [root:validation.py:58] Training pytorch-MLP-nhid0-adam-bs64 with (inner) 5-fold cross-validation
+[2024-04-21 11:33:37,309] [INFO] [root:validation.py:89] Best param found at split 1: l2reg = 1e-05                 with score 80.56
+[2024-04-21 11:34:08,058] [INFO] [root:validation.py:89] Best param found at split 2: l2reg = 0.0001                 with score 79.74
+[2024-04-21 11:34:37,400] [INFO] [root:validation.py:89] Best param found at split 3: l2reg = 1e-05                 with score 79.74
+[2024-04-21 11:35:09,919] [INFO] [root:validation.py:89] Best param found at split 4: l2reg = 1e-05                 with score 79.57
+[2024-04-21 11:35:40,722] [INFO] [root:validation.py:89] Best param found at split 5: l2reg = 0.0001                 with score 79.4
+[2024-04-21 11:35:41,862] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:35:41,934] [INFO] [src.utils:utils.py:28] Found 6222 unique tokens
+[2024-04-21 11:35:41,934] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:35:41,934] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:35:48,566] [INFO] [src.utils:utils.py:49] Found 6204 tokens with embeddings
+[2024-04-21 11:35:48,692] [INFO] [root:binary.py:44] Generating sentence embeddings
+[2024-04-21 11:35:49,005] [INFO] [root:binary.py:50] Generated sentence embeddings
+[2024-04-21 11:35:49,006] [INFO] [root:validation.py:58] Training pytorch-MLP-nhid0-adam-bs64 with (inner) 5-fold cross-validation
+[2024-04-21 11:36:30,238] [INFO] [root:validation.py:89] Best param found at split 1: l2reg = 1e-05                 with score 68.78
+[2024-04-21 11:37:13,755] [INFO] [root:validation.py:89] Best param found at split 2: l2reg = 1e-05                 with score 68.77
+[2024-04-21 11:37:57,184] [INFO] [root:validation.py:89] Best param found at split 3: l2reg = 1e-05                 with score 68.77
+[2024-04-21 11:38:40,609] [INFO] [root:validation.py:89] Best param found at split 4: l2reg = 1e-05                 with score 68.77
+[2024-04-21 11:39:24,022] [INFO] [root:validation.py:89] Best param found at split 5: l2reg = 1e-05                 with score 68.78
+[2024-04-21 11:39:26,461] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:39:26,808] [INFO] [src.utils:utils.py:28] Found 21020 unique tokens
+[2024-04-21 11:39:26,808] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:39:26,808] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:39:34,057] [INFO] [src.utils:utils.py:49] Found 20049 tokens with embeddings
+[2024-04-21 11:39:34,175] [INFO] [root:binary.py:44] Generating sentence embeddings
+[2024-04-21 11:39:35,219] [INFO] [root:binary.py:50] Generated sentence embeddings
+[2024-04-21 11:39:35,220] [INFO] [root:validation.py:58] Training pytorch-MLP-nhid0-adam-bs64 with (inner) 5-fold cross-validation
+[2024-04-21 11:40:53,438] [INFO] [root:validation.py:89] Best param found at split 1: l2reg = 0.0001                 with score 91.26
+[2024-04-21 11:42:09,599] [INFO] [root:validation.py:89] Best param found at split 2: l2reg = 1e-05                 with score 91.11
+[2024-04-21 11:43:26,981] [INFO] [root:validation.py:89] Best param found at split 3: l2reg = 1e-05                 with score 91.48
+[2024-04-21 11:44:51,153] [INFO] [root:validation.py:89] Best param found at split 4: l2reg = 1e-05                 with score 91.36
+[2024-04-21 11:46:16,569] [INFO] [root:validation.py:89] Best param found at split 5: l2reg = 1e-05                 with score 91.21
+[2024-04-21 11:46:19,331] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:46:20,464] [INFO] [src.utils:utils.py:28] Found 16183 unique tokens
+[2024-04-21 11:46:20,464] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:46:20,464] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:46:27,953] [INFO] [src.utils:utils.py:49] Found 15738 tokens with embeddings
+[2024-04-21 11:46:28,050] [INFO] [root:sst.py:62] Computing embedding for train
+[2024-04-21 11:46:32,478] [INFO] [root:sst.py:76] Computed train embeddings
+[2024-04-21 11:46:32,478] [INFO] [root:sst.py:62] Computing embedding for dev
+[2024-04-21 11:46:32,561] [INFO] [root:sst.py:76] Computed dev embeddings
+[2024-04-21 11:46:32,561] [INFO] [root:sst.py:62] Computing embedding for test
+[2024-04-21 11:46:32,733] [INFO] [root:sst.py:76] Computed test embeddings
+[2024-04-21 11:46:32,733] [INFO] [root:validation.py:203] Training pytorch-MLP-nhid0-adam-bs64 with standard validation..
+[2024-04-21 11:47:53,090] [INFO] [root:validation.py:224] [('reg:1e-05', 49.08), ('reg:0.0001', 49.08), ('reg:0.001', 49.08), ('reg:0.01', 49.08)]
+[2024-04-21 11:47:53,090] [INFO] [root:validation.py:228] Validation : best param found is reg = 1e-05 with score             49.08
+[2024-04-21 11:47:53,090] [INFO] [root:validation.py:231] Evaluating...
+[2024-04-21 11:48:13,180] [INFO] [root:trec.py:24] ***** Transfer task : TREC *****
+
+
+[2024-04-21 11:48:13,230] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:48:13,322] [INFO] [src.utils:utils.py:28] Found 8766 unique tokens
+[2024-04-21 11:48:13,322] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:48:13,322] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:48:20,738] [INFO] [src.utils:utils.py:49] Found 8535 tokens with embeddings
+[2024-04-21 11:48:21,150] [INFO] [root:trec.py:66] Computed train embeddings
+[2024-04-21 11:48:21,179] [INFO] [root:trec.py:74] Computed test embeddings
+[2024-04-21 11:48:21,179] [INFO] [root:validation.py:128] Training pytorch-MLP-nhid0-adam-bs64 with 5-fold cross-validation
+[2024-04-21 11:49:32,025] [INFO] [root:validation.py:160] [('reg:1e-05', 73.33), ('reg:0.0001', 73.22), ('reg:0.001', 72.45), ('reg:0.01', 65.63)]
+[2024-04-21 11:49:32,028] [INFO] [root:validation.py:164] Cross-validation : best param found is reg = 1e-05             with score 73.33
+[2024-04-21 11:49:32,028] [INFO] [root:validation.py:167] Evaluating...
+[2024-04-21 11:49:35,394] [INFO] [root:mrpc.py:25] ***** Transfer task : MRPC *****
+
+
+[2024-04-21 11:49:35,439] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:49:35,807] [INFO] [src.utils:utils.py:28] Found 15665 unique tokens
+[2024-04-21 11:49:35,807] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:49:35,807] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:49:42,768] [INFO] [src.utils:utils.py:49] Found 14755 tokens with embeddings
+[2024-04-21 11:49:42,860] [INFO] [root:mrpc.py:58] Computing embedding for train
+[2024-04-21 11:49:43,717] [INFO] [root:mrpc.py:78] Computed train embeddings
+[2024-04-21 11:49:43,717] [INFO] [root:mrpc.py:58] Computing embedding for test
+[2024-04-21 11:49:44,108] [INFO] [root:mrpc.py:78] Computed test embeddings
+[2024-04-21 11:49:44,117] [INFO] [root:validation.py:128] Training pytorch-MLP-nhid0-adam-bs64 with 5-fold cross-validation
+[2024-04-21 11:50:12,218] [INFO] [root:validation.py:160] [('reg:1e-05', 73.23), ('reg:0.0001', 73.14), ('reg:0.001', 73.14), ('reg:0.01', 72.6)]
+[2024-04-21 11:50:12,219] [INFO] [root:validation.py:164] Cross-validation : best param found is reg = 1e-05             with score 73.23
+[2024-04-21 11:50:12,219] [INFO] [root:validation.py:167] Evaluating...
+[2024-04-21 11:50:13,785] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:50:14,068] [INFO] [src.utils:utils.py:28] Found 2314 unique tokens
+[2024-04-21 11:50:14,069] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:50:14,069] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:50:21,028] [INFO] [src.utils:utils.py:49] Found 2310 tokens with embeddings
+[2024-04-21 11:50:21,081] [INFO] [root:sick.py:167] Computing embedding for train
+[2024-04-21 11:50:21,634] [INFO] [root:sick.py:185] Computed train embeddings
+[2024-04-21 11:50:21,634] [INFO] [root:sick.py:167] Computing embedding for dev
+[2024-04-21 11:50:21,720] [INFO] [root:sick.py:185] Computed dev embeddings
+[2024-04-21 11:50:21,720] [INFO] [root:sick.py:167] Computing embedding for test
+[2024-04-21 11:50:22,318] [INFO] [root:sick.py:185] Computed test embeddings
+[2024-04-21 11:50:22,332] [INFO] [root:validation.py:203] Training pytorch-MLP-nhid0-adam-bs64 with standard validation..
+[2024-04-21 11:50:35,800] [INFO] [root:validation.py:224] [('reg:1e-05', 80.8), ('reg:0.0001', 80.4), ('reg:0.001', 78.4), ('reg:0.01', 71.4)]
+[2024-04-21 11:50:35,801] [INFO] [root:validation.py:228] Validation : best param found is reg = 1e-05 with score             80.8
+[2024-04-21 11:50:35,801] [INFO] [root:validation.py:231] Evaluating...
+[2024-04-21 11:50:39,839] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:50:40,123] [INFO] [src.utils:utils.py:28] Found 2314 unique tokens
+[2024-04-21 11:50:40,123] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:50:40,123] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:50:46,852] [INFO] [src.utils:utils.py:49] Found 2310 tokens with embeddings
+[2024-04-21 11:50:46,897] [INFO] [root:sick.py:63] Computing embedding for train
+[2024-04-21 11:50:47,494] [INFO] [root:sick.py:82] Computed train embeddings
+[2024-04-21 11:50:47,494] [INFO] [root:sick.py:63] Computing embedding for dev
+[2024-04-21 11:50:47,557] [INFO] [root:sick.py:82] Computed dev embeddings
+[2024-04-21 11:50:47,557] [INFO] [root:sick.py:63] Computing embedding for test
+[2024-04-21 11:50:48,219] [INFO] [root:sick.py:82] Computed test embeddings
+[2024-04-21 11:51:08,665] [INFO] [src.utils:utils.py:102] Finding all unique tokens
+[2024-04-21 11:51:08,813] [INFO] [src.utils:utils.py:28] Found 8799 unique tokens
+[2024-04-21 11:51:08,813] [INFO] [src.utils:utils.py:104] Aligning with GloVe vectors
+[2024-04-21 11:51:08,813] [INFO] [torchtext.vocab.vectors:vectors.py:172] Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+[2024-04-21 11:51:15,696] [INFO] [src.utils:utils.py:49] Found 8493 tokens with embeddings
+{'MR': {'devacc': 77.24, 'acc': 76.83, 'ndev': 10662, 'ntest': 10662}, 'CR': {'devacc': 79.8, 'acc': 78.68, 'ndev': 3775, 'ntest': 3775}, 'MPQA': {'devacc': 68.77, 'acc': 68.77, 'ndev': 10606, 'ntest': 10606}, 'SUBJ': {'devacc': 91.28, 'acc': 90.91, 'ndev': 10000, 'ntest': 10000}, 'SST2': {'devacc': 49.08, 'acc': 50.08, 'ndev': 872, 'ntest': 1821}, 'TREC': {'devacc': 73.33, 'acc': 81.8, 'ndev': 5452, 'ntest': 500}, 'MRPC': {'devacc': 73.23, 'acc': 72.87, 'f1': 81.7, 'ndev': 4076, 'ntest': 1725}, 'SICKEntailment': {'devacc': 80.8, 'acc': 78.71, 'ndev': 500, 'ntest': 4927}, 'SICKRelatedness': {'devpearson': 0.795015486566373, 'pearson': 0.800668736939742, 'spearman': 0.7212512894057191, 'mse': 0.36538412714428087, 'yhat': array([2.8532337 , 4.02186559, 1.00050643, ..., 3.47424103, 4.4244094 ,
+       4.55483705]), 'ndev': 500, 'ntest': 4927}, 'STS14': {'deft-forum': {'pearson': PearsonRResult(statistic=0.2981026715265089, pvalue=1.0934882037857811e-10), 'spearman': SignificanceResult(statistic=0.3434836826302498, pvalue=6.611015520548573e-14), 'nsamples': 450}, 'deft-news': {'pearson': PearsonRResult(statistic=0.6531195790062583, pvalue=7.272345271481483e-38), 'spearman': SignificanceResult(statistic=0.6530169336965405, pvalue=7.531284885089392e-38), 'nsamples': 300}, 'headlines': {'pearson': PearsonRResult(statistic=0.5917234092501836, pvalue=4.865373823651575e-72), 'spearman': SignificanceResult(statistic=0.5471536699413776, pvalue=8.640121308311465e-60), 'nsamples': 750}, 'images': {'pearson': PearsonRResult(statistic=0.6179840460093813, pvalue=3.3711629515676526e-80), 'spearman': SignificanceResult(statistic=0.6144636555651922, pvalue=4.638783367403427e-79), 'nsamples': 750}, 'OnWN': {'pearson': PearsonRResult(statistic=0.5791338556319917, pvalue=2.1850592809497444e-68), 'spearman': SignificanceResult(statistic=0.6463331184521678, pvalue=6.390173271877557e-90), 'nsamples': 750}, 'tweet-news': {'pearson': PearsonRResult(statistic=0.5524065359530744, pvalue=3.87112235539704e-61), 'spearman': SignificanceResult(statistic=0.5280349391884588, pvalue=4.454802837661674e-55), 'nsamples': 750}, 'all': {'pearson': {'mean': 0.5487450162295664, 'wmean': 0.5562714562726079}, 'spearman': {'mean': 0.5554143332456645, 'wmean': 0.5606564732407926}}}}
+{'macro': 74.19125, 'micro': 77.23550704133382}
+
+JOB STATISTICS
+==============
+Job ID: 5993556
+Cluster: snellius
+User/Group: scur0209/scur0209
+State: RUNNING
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 07:32:42 core-walltime
+Job Wall-clock time: 00:25:09
+Memory Utilized: 0.00 MB (estimated maximum)
+Memory Efficiency: 0.00% of 120.00 GB (120.00 GB/node)
+WARNING: Efficiency statistics may be misleading for RUNNING jobs.
