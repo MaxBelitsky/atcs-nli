@@ -31,9 +31,13 @@ All arguments with their description can be viewed with `python -m src.eval -h`.
 
 ## Results
 
+Training logs can be found in the [training report](https://wandb.ai/mbelitsky/uva-acts/reports/Untitled-Report--Vmlldzo3NjI3MTQ5?accessToken=jbxp2lji6h7s6nndksome0ujvp82s6dbc9pjujp5gjojfj7gk7jxr0ko59luzwi4).
+
+The pre-trained models checkpoints can be found [here](https://drive.google.com/drive/folders/18yYWQJ3VB4N7PvhdZDPIs4sUC-TOHe_W?usp=sharing).
+
 ### Results on SNLI task
 
-The accuracy is rounded to two decimal points.
+The results on the SNLI task. The accuracy is rounded to two decimal points.
 
 | Model                   | Validation accuracy | Test accuracy |
 |-------------------------|---------------------|---------------|
@@ -41,8 +45,19 @@ The accuracy is rounded to two decimal points.
 | BiLSTM                  |         80.55	    |      80.32    |
 | BiLSTM with max pooling |         84.87       |      84.47    |
 
+### Averaged results on transfer tasks
 
-### Transfer results
+Following the methodology of Conneau et al. (2018), ”micro” and ”macro” averages of development set (dev) results on transfer tasks whose metrics is accuracy. The accuracy is rounded to two decimal points.
+
+| Model                   | Micro | Macro |
+|-------------------------|-------|-------|
+| Mean                    | 77.24 | 74.19 |
+| LSTM                    | 79.75 | 78.94 |
+| BiLSTM                  | 82.63 | 81.7  |
+| BiLSTM with max pooling | 84.25 | 83.27 |
+
+
+### Results on specific transfer results
 | Model                   | MR    | CR    | SUBJ  | MPQA  | SST   | TREC | MRPC        | SICK-R | SICK-E | STS14     |
 |-------------------------|-------|-------|-------|-------|-------|------|-------------|--------|--------|-----------|
 | GloVe BOW               |       |       |       |       |       |      |             |        |        |           |
